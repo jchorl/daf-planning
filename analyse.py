@@ -61,7 +61,8 @@ def main():
         total_cost_basis += base["Cost Basis"]
         donation_rows.append(base)
 
-    pprint.pp(donation_rows)
+    for r in donation_rows:
+        print(f"{r['Stock']}: Purchased {r['Open Date']}, Quantity {r['Quantity']}")
     print(f"COST BASIS: ${total_cost_basis} (out of total ${total_donated})")
 
 
