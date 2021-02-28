@@ -1,8 +1,8 @@
 import csv
+from collections import defaultdict
 from decimal import Decimal
 from operator import itemgetter
 import os
-import pprint
 from re import sub
 
 
@@ -22,6 +22,7 @@ def parse_cost_basis_row(row):
     for field in money_fields:
         # straight from https://stackoverflow.com/a/8422055
         row[field] = Decimal(sub(r"[^\d.]", "", row[field]))
+    row["Quantity"] = float(row["Quantity"])
     return row
 
 
@@ -61,8 +62,16 @@ def main():
         total_cost_basis += base["Cost Basis"]
         donation_rows.append(base)
 
+    cost_bases_by_ticker = defaultdict(lambda: 0)
+    share_quantity_by_ticker = defaultdict(lambda: 0)
     for r in donation_rows:
+        cost_bases_by_ticker[r["Stock"]] += r["Cost Basis"]
+        share_quantity_by_ticker[r["Stock"]] += r["Quantity"]
         print(f"{r['Stock']}: Purchased {r['Open Date']}, Quantity {r['Quantity']}")
+
+    for stock, cost_basis in cost_bases_by_ticker.items():
+        print(f"Cost basis for {stock}: {cost_basis}, number of shares: {share_quantity_by_ticker[stock]}")
+
     print(f"COST BASIS: ${total_cost_basis} (out of total ${total_donated})")
 
 
